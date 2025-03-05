@@ -3,7 +3,6 @@ import numpy as np
 from ultralytics import YOLO
 import time
 from utils import load_yolo_model, YOLOModel, load_ssr_model
-from tqdm import tqdm
 
 def predict_gender(faces, gender_net, age_net):
     face_size = 64
@@ -34,14 +33,10 @@ def process_video(video_path, output_path):
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = int(cap.get(cv2.CAP_PROP_FPS))
-    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     
     # 创建视频写入器
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-    
-    # 创建进度条
-    pbar = tqdm(total=min(total_frames, 300), desc="处理视频")
     
     while cap.isOpened():
         success, frame = cap.read()
@@ -52,6 +47,8 @@ def process_video(video_path, output_path):
         results = model(frame)
         
         # 处理检测结果
+        rectangles = []
+        faces = []
         for result in results:
             boxes = result.boxes
             for box in boxes:
@@ -62,25 +59,27 @@ def process_video(video_path, output_path):
                 # 提取人脸区域
                 face = frame[y1:y2, x1:x2]
                 
-                # 性别分类
-                label = predict_gender([face], gender_net, age_net)[0]
+                rectangles.append((x1, y1, x2, y2))
+                faces.append(face)
                 
-                # 绘制边界框和标签
-                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                cv2.putText(frame, label, (x1, y1-10), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+        labels = predict_gender(faces, gender_net, age_net)
+
+        for rectangle, label in zip(rectangles, labels):
+            x1, y1, x2, y2 = rectangle
+            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.putText(frame, label, (x1, y1-10), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
         
         # 写入处理后的帧
         out.write(frame)
         
-        # 更新进度条
-        pbar.update(1)
+        # 打印处理进度
+        print(f"处理帧: {int(cap.get(cv2.CAP_PROP_POS_FRAMES))}/{int(cap.get(cv2.CAP_PROP_FRAME_COUNT))}")
         
         if int(cap.get(cv2.CAP_PROP_POS_FRAMES)) > 300:
             break   
     
     # 释放资源
-    pbar.close()
     cap.release()
     out.release()
     print(f"处理完成，结果保存到: {output_path}")
