@@ -76,8 +76,8 @@ def process_video(video_path, output_path):
         # 打印处理进度
         print(f"处理帧: {int(cap.get(cv2.CAP_PROP_POS_FRAMES))}/{int(cap.get(cv2.CAP_PROP_FRAME_COUNT))}")
         
-        if int(cap.get(cv2.CAP_PROP_POS_FRAMES)) > 300:
-            break   
+        # if int(cap.get(cv2.CAP_PROP_POS_FRAMES)) > 200:
+        #     break   
     
     # 释放资源
     cap.release()
@@ -85,6 +85,6 @@ def process_video(video_path, output_path):
     print(f"处理完成，结果保存到: {output_path}")
 
 if __name__ == "__main__":
-    video_path = "video/白宫吵架大会.mp4"  # 使用正确的视频文件名
+    video_path = "video/白宫吵架大会2.mp4"  # 使用正确的视频文件名
     output_path = 'outputs/output.mp4'
     process_video(video_path, output_path)

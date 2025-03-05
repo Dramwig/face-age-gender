@@ -4,6 +4,10 @@
 
 A real-time face gender and age recognition system based on YOLOv8-face and SSR-Net. Using lightweight models to achieve fast and accurate face detection and attribute analysis, supporting video stream processing.
 
+<p align="center">
+  <img src="outputs/output.gif" alt="e.q."/>
+</p>
+
 ## Architecture
 
 - Face Detection: YOLOv8-face for robust face detection
@@ -21,7 +25,7 @@ pip install ultralytics # Install the ultralytics package from PyPI
 pip install tensorflow==2.10.0 # For SSR-Net
 ```
 
-## Use
+## Basis 
 
-yolo8-face: https://github.com/lindevs/yolov8-face?tab=readme-ov-file
-SSR-Net: https://github.com/diovisgood/agender
+- yolo8-face: https://github.com/lindevs/yolov8-face?tab=readme-ov-file
+- SSR-Net: https://github.com/diovisgood/agender
