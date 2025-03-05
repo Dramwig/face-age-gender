@@ -1,6 +1,15 @@
-# 基于深度学习的性别与年龄的智能识别系统
+# Deep Learning Based Gender and Age Recognition System
 
-基于yolo8-face和SSR-Net的轻量化性别与年龄识别框架
+基于 YOLOv8-face 和 SSR-Net 的实时人脸性别与年龄识别系统。使用轻量级模型实现快速准确的人脸检测和属性分析，支持视频流处理。
+
+A real-time face gender and age recognition system based on YOLOv8-face and SSR-Net. Using lightweight models to achieve fast and accurate face detection and attribute analysis, supporting video stream processing.
+
+## Architecture
+
+- Face Detection: YOLOv8-face for robust face detection
+- Gender Recognition: SSR-Net based gender classifier
+- Age Estimation: SSR-Net based age regressor
+- Video Processing: OpenCV based video stream handler
 
 ## Envs
 
