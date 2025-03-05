@@ -5,15 +5,21 @@
 A real-time face gender and age recognition system based on YOLOv8-face and SSR-Net. Using lightweight models to achieve fast and accurate face detection and attribute analysis, supporting video stream processing.
 
 <p align="center">
-  <img src="outputs/output.gif" alt="e.q."/>
+  <img src="img/output.gif" alt="e.q."/>
 </p>
+
 
 ## Architecture
 
 - Face Detection: YOLOv8-face for robust face detection
 - Gender Recognition: SSR-Net based gender classifier
-- Age Estimation: SSR-Net based age regressor
+- Age Estimation: SSR-Net based age regressorimg
 - Video Processing: OpenCV based video stream handler
+
+<p align="center">
+  <img src="img/front.png" alt="e.q." width="300px"/>
+</p>
+
 
 ## Envs
 

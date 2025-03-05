@@ -66,8 +66,8 @@ def upload_file():
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         timestamp = int(time.time())
-        input_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{timestamp}_{filename}")
-        output_path = os.path.join('outputs', f"{timestamp}_{filename}")
+        input_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{timestamp}.{filename}")
+        output_path = os.path.join('outputs', f"{timestamp}.{filename}")
         
         file.save(input_path)
         
