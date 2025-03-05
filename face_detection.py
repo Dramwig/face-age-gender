@@ -5,19 +5,32 @@ import time
 from utils import load_yolo_model, YOLOModel, load_ssr_model
 
 def predict_gender(faces, gender_net, age_net):
+    if not faces:  # 如果没有检测到人脸
+        return []
+        
     face_size = 64
     blob = np.empty((len(faces), face_size, face_size, 3))
     for i, face_bgr in enumerate(faces):
         blob[i, :, :, :] = cv2.resize(face_bgr, (64, 64))
         blob[i, :, :, :] = cv2.normalize(blob[i, :, :, :], None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
-    # Predict gender and age
-    genders = gender_net.predict(blob)
-    ages = age_net.predict(blob)
-    #  Construct labels
-    labels = ['{},{}'.format('Male' if (gender >= 0.5) else 'Female', int(age)) for (gender, age) in zip(genders, ages)]
-    return labels
+    
+    try:
+        # Predict gender and age
+        genders = gender_net.predict(blob, verbose=0)
+        ages = age_net.predict(blob, verbose=0)
+        
+        # 确保预测结果不为空
+        if len(genders) == 0 or len(ages) == 0:
+            return []
+            
+        #  Construct labels
+        labels = ['{},{}'.format('Male' if (float(gender) >= 0.5) else 'Female', int(float(age))) for (gender, age) in zip(genders, ages)]
+        return labels
+    except Exception as e:
+        print(f"预测错误: {str(e)}")
+        return []
 
-def process_video(video_path, output_path):
+def process_video(video_path, output_path, processing_status=None, timestamp=None):
     # 加载YOLO模型
     model = load_yolo_model(YOLOModel.YOLOv8n_Face)
     gender_net, age_net = load_ssr_model()
@@ -33,11 +46,13 @@ def process_video(video_path, output_path):
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = int(cap.get(cv2.CAP_PROP_FPS))
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     
     # 创建视频写入器
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
     
+    frame_count = 0
     while cap.isOpened():
         success, frame = cap.read()
         if not success:
@@ -73,11 +88,12 @@ def process_video(video_path, output_path):
         # 写入处理后的帧
         out.write(frame)
         
-        # 打印处理进度
-        print(f"处理帧: {int(cap.get(cv2.CAP_PROP_POS_FRAMES))}/{int(cap.get(cv2.CAP_PROP_FRAME_COUNT))}")
-        
-        # if int(cap.get(cv2.CAP_PROP_POS_FRAMES)) > 200:
-        #     break   
+        # 更新进度
+        frame_count += 1
+        if processing_status is not None and timestamp is not None:
+            progress = int((frame_count / total_frames) * 100)
+            processing_status[timestamp]['progress'] = progress
+            processing_status[timestamp]['message'] = f'正在处理第 {frame_count}/{total_frames} 帧'
     
     # 释放资源
     cap.release()
